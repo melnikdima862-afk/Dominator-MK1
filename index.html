@@ -564,18 +564,19 @@
             });
         }
     </script>
-    <div style="text-align: center; margin: 20px 0; color: #888; font-size: 14px;">
+<div style="text-align: center; margin: 20px 0; color: #888; font-size: 14px;">
     Просмотров сайта: <span id="view-counter">...</span>
 </div>
 <script>
-    fetch('https://api.counterapi.dev/v1/melnikdima862-afk/Dominator-MK1/hit')
+    fetch('https://api.counterapi.dev/v2/melnikdima862-afk/Dominator-MK1/hit')
         .then(res => res.json())
         .then(data => {
-            document.getElementById('view-counter').innerText = data.count !== undefined ? data.count : JSON.stringify(data);
+            document.getElementById('view-counter').innerText = data.value !== undefined ? data.value : (data.count !== undefined ? data.count : '1');
         })
         .catch(e => {
             document.getElementById('view-counter').innerText = '1';
         });
 </script>
+    
 </body>
 </html>
