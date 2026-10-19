@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Dominator MK1 — Custom Dual VESC Build</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0A0A0C;
+            color: #E0E0E6;
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+
+        header {
+            text-align: center;
+            padding: 25px 20px;
+            background: rgba(18, 18, 22, 0.95);
+            border-bottom: 2px solid #00FFCC;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: #00FFCC;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            font-weight: 800;
+        }
+
+        header p {
+            color: #8A8A9E;
+            font-size: 0.95rem;
+            margin-top: 6px;
+        }
+
+        .header-telegram-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 14px;
+            background: rgba(0, 255, 204, 0.1);
+            border: 1px solid #00FFCC;
+            padding: 6px 16px;
+            border-radius: 20px;
+            color: #00FFCC;
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        /* БЛОК ОПИСАНИЯ ПРОЕКТА */
+        .project-overview {
+            max-width: 950px;
+            margin: 25px auto 10px auto;
+            width: 96%;
+            background: #121216;
+            border: 1px solid #22222C;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 255, 204, 0.05);
+        }
+
+        .project-overview h2 {
+            color: #00FFCC;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .project-overview p {
+            color: #B0B0C0;
+            font-size: 0.88rem;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .project-overview p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* УДОБНЫЙ И НАДЕЖНЫЙ HUD-БЛОК */
+        .hud-wrapper {
+            max-width: 950px;
+            margin: 20px auto;
+            width: 96%;
+            background: #121216;
+            border: 1px solid #22222C;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .main-scooter-img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            display: block;
+        }
+
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 5px;
+        }
+
+        .hud-btn {
+            background: #1A1A22;
+            border: 2px solid #00FFCC;
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .hud-btn:active {
+            background: rgba(0, 255, 204, 0.2);
+        }
+
+        .hud-node {
+            width: 36px;
+            height: 36px;
+            background: rgba(0, 255, 204, 0.2);
+            border: 1px solid #00FFCC;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00FFCC;
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .hud-label {
+            font-size: 0.9rem;
+            color: #FFF;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .donation-section {
+            max-width: 950px;
+            margin: 20px auto;
+            width: 96%;
+            text-align: center;
+            background: #121216;
+            padding: 28px;
+            border-radius: 16px;
+            border: 1px solid #22222C;
+        }
+
+        .donation-section h2 {
+            font-size: 1.4rem;
+            color: #FFF;
+            margin-bottom: 8px;
+        }
+
+        .donation-section p {
+            color: #8A8A9E;
+            font-size: 0.9rem;
+        }
+
+        .btn-kofi {
+            display: inline-block;
+            margin-top: 18px;
+            background: #00FFCC;
+            color: #0A0A0C;
+            padding: 12px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 800;
+            cursor: pointer;
+            border: none;
+            text-transform: uppercase;
+        }
+
+        .btn-telegram-footer {
+            display: inline-block;
+            margin-top: 12px;
+            margin-left: 10px;
+            background: #229ED9;
+            color: #FFF;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        /* МОДАЛЬНЫЕ ОКНА */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.88);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .modal-content {
+            background: #14141A;
+            border: 1px solid #00FFCC;
+            border-radius: 16px;
+            max-width: 520px;
+            width: 100%;
+            padding: 24px;
+            position: relative;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 18px;
+            color: #8A8A9E;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .modal-title {
+            color: #00FFCC;
+            font-size: 1.35rem;
+            margin-bottom: 14px;
+            font-weight: 700;
+        }
+
+        .modal-images-container {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+        }
+
+        .modal-img {
+            width: 100%;
+            min-width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .multi-img {
+            min-width: 75% !important;
+        }
+
+        .modal-desc {
+            font-size: 0.88rem;
+            color: #D0D0DC;
+            margin-bottom: 16px;
+            white-space: pre-line;
+        }
+
+        .specs-list {
+            list-style: none;
+            margin-bottom: 20px;
+            background: #1A1A22;
+            padding: 12px 16px;
+            border-radius: 8px;
+        }
+
+        .specs-list li {
+            padding: 6px 0;
+            border-bottom: 1px solid #282838;
+            font-size: 0.83rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .price-tag {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #00FFCC;
+            margin-bottom: 16px;
+            text-align: right;
+        }
+
+        .btn-donate {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background: #00FFCC;
+            color: #0A0A0C;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .crypto-modal-content {
+            background: #1e1e1e;
+            color: #fff;
+            padding: 24px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 420px;
+            position: relative;
+            border: 1px solid #00FFCC;
+        }
+
+        .donate-card {
+            background: #2a2a2a;
+            padding: 14px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .wallet-address {
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            background: #111;
+            padding: 10px;
+            border-radius: 6px;
+            color: #00FFCC;
+            margin: 10px 0;
+        }
+
+        .copy-btn {
+            background: #00FFCC;
+            color: #0A0A0C;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Project Dominator MK1</h1>
+        <p>Custom All-Weather Dual-Motor Beast</p>
+        <a href="https://t.me/+_c4Z1aV0lZA4OTJi" target="_blank" class="header-telegram-badge">
+            📢 Join Telegram Build Log
+        </a>
+    </header>
+
+    <!-- ИСТОРИЯ И ЦЕЛЬ ПРОЕКТА (ВЕРНУЛИ НА МЕСТО) -->
+    <div class="project-overview">
+        <h2>The Origin & Vision</h2>
+        <p>It all started when a dead, beat-up <strong>Like.Bike 2.0</strong> was rescued for just <strong>$110</strong>. With nothing more than a piece of copper wire and pure garage determination, it was brought back to life. Out of the box, it features a dual-motor setup (2kW total / dual 1kW hubs) and a 52V 20Ah battery. Though it's currently battered and on its last legs, it still takes a beating and commutes every single day.</p>
+        <p><strong>The Goal:</strong> Transform this survivor into an ultimate, all-weather, all-terrain beast capable of conquering any hill in any weather conditions and on any surface. As parts arrive and funding progresses, this page will be updated with regular photo logs, build updates, and rigorous video test reports.</p>
+        <p style="color: #00FFCC; font-weight: 600; margin-top: 8px;">A massive thank you to everyone supporting and following this build!</p>
+    </div>
+
+    <!-- КЛИКАБЕЛЬНЫЕ КАРТОЧКИ КОМПОНЕНТОВ -->
+    <div class="hud-wrapper">
+        <img src="scooter.png" alt="Project Dominator MK1" class="main-scooter-img" onerror="this.src='https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800'">
+        
+        <div class="buttons-grid">
+            <div class="hud-btn" onclick="openModal('vesc')">
+                <div class="hud-node">1</div>
+                <div class="hud-label">VESC</div>
+            </div>
+            <div class="hud-btn" onclick="openModal('motor')">
+                <div class="hud-node">2</div>
+                <div class="hud-label">Motors</div>
+            </div>
+            <div class="hud-btn" onclick="openModal('battery')">
+                <div class="hud-node">3</div>
+                <div class="hud-label">Battery</div>
+            </div>
+            <div class="hud-btn" onclick="openModal('optics')">
+                <div class="hud-node">4</div>
+                <div class="hud-label">Optics</div>
+            </div>
+            <div class="hud-btn" onclick="openModal('handlebar')">
+                <div class="hud-node">5</div>
+                <div class="hud-label">Handlebar</div>
+            </div>
+            <div class="hud-btn" onclick="openModal('brakes')">
+                <div class="hud-node">6</div>
+                <div class="hud-label">Brakes</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="donation-section">
+        <h2>Support Project Dominator MK1</h2>
+        <p>Help me fund high-performance components and bring this custom electric beast to life.</p>
+        <div>
+            <button class="btn-kofi" onclick="openDonateModal()">Support via USDT</button>
+            <a href="https://t.me/+_c4Z1aV0lZA4OTJi" target="_blank" class="btn-telegram-footer">Telegram Channel</a>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО КОМПОНЕНТОВ -->
+    <div class="modal-overlay" id="infoModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h3 class="modal-title" id="modalTitle">Component Title</h3>
+            <div class="modal-images-container" id="modalImagesContainer"></div>
+            <div class="modal-desc" id="modalDesc">Description text...</div>
+            <ul class="specs-list" id="modalSpecs"></ul>
+            <div class="price-tag" id="modalPrice">Est. Cost: $0</div>
+            <button class="btn-donate" onclick="openDonateFromInfo()">Fund This Component</button>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ДОНАТОВ -->
+    <div class="modal-overlay" id="donateModal">
+        <div class="crypto-modal-content">
+            <span class="close-btn" onclick="closeDonateModal()">&times;</span>
+            <h2 style="margin-top: 0; color: #00FFCC; font-size: 1.3rem;">Support Project Dominator MK1</h2>
+            <p style="font-size: 0.88rem; color: #bbb; margin-top: 6px;">Send USDT via Tron network (TRC20):</p>
+            <div class="donate-card">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.95rem; color: #fff;">🪙 USDT (TRC20 / Tron)</h4>
+                <p class="wallet-address" id="usdtAddress">TMAFnANoCQFLLR9jELKMGsYs7HXMUD6kCc</p>
+                <button class="copy-btn" onclick="copyWallet()">Copy Address</button>
+                <span id="copyNotice" style="display: none; color: #00FFCC; font-size: 12px; margin-top: 8px; text-align: center; font-weight: bold;">Address copied!</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const componentsData = {
+            vesc: {
+                title: "Dual VESC Controller (FOC & Telemetry)",
+                images: ["vesc.jpg"],
+                price: "$180 – $220",
+                desc: "High-performance programmable Dual VESC ESC supporting up to 84V (4S-20S). Features Field Oriented Control (FOC) for silent operation, smooth regenerative braking, slide-on power, auto power-off, and full lighting/horn controls.",
+                specs: [
+                    { name: "Firmware Version", val: "V1.2 (Flipsky ESC Tool)" },
+                    { name: "Voltage Range", val: "14V - 84V (Safe for 4S-20S Li-ion)" },
+                    { name: "Continuous Current", val: "100A Single / 200A Dual" },
+                    { name: "Peak Current", val: "250A Single / 500A Dual" },
+                    { name: "Comm Ports", val: "USB, CAN, UART, PPM, ADC" },
+                    { name: "BEC Output", val: "5V @ 1A" }
+                ]
+            },
+            motor: {
+                title: "JYX 2000W Heavy-Duty Traction Hub Motor",
+                images: ["motor.jpg"],
+                price: "$110 – $140",
+                desc: "Original factory OEM JYX 2000W traction hub motor engineered for extreme loads and high-torque performance. Built with thick copper windings and high-temp neodymium magnets to maintain peak efficiency without thermal degradation.",
+                specs: [
+                    { name: "Nominal Power", val: "2000W (2 kW)" },
+                    { name: "Operating Voltage", val: "60V" },
+                    { name: "Rim Size", val: "12-inch Heavy Rim" },
+                    { name: "Motor Type", val: "Brushless Direct Drive (BLDC)" }
+                ]
+            },
+            battery: {
+                title: "16S2P LiFePO4 Pack, JK BMS & Spot Welding Assembly Kit",
+                images: ["akb.jpg", "bms.jpg", "spot_welder.jpg"], 
+                price: "$480 – $550",
+                desc: "Custom high-capacity battery build utilizing reliable cells, smart JK BMS with active balancing, and heavy-duty interconnects to deliver stable amps under peak load.",
+                specs: [
+                    { name: "Configuration", val: "16S2P" },
+                    { name: "BMS System", val: "JK Smart BMS with Bluetooth" },
+                    { name: "Nominal Voltage", val: "58.4V - 60V" }
+                ]
+            },
+            optics: {
+                title: "High-Output Auxiliary LED Optics",
+                images: ["optics.jpg"],
+                price: "$45 – $70",
+                desc: "Powerful custom LED light pods for night riding and all-weather visibility, wired directly into the auxiliary power lines.",
+                specs: [
+                    { name: "Beam Pattern", val: "Spot / Flood Combo" },
+                    { name: "Voltage", val: "12V - 80V DC compatible" }
+                ]
+            },
+            handlebar: {
+                title: "Reinforced Handlebar & Control Center",
+                images: ["handlebar.jpg"],
+                price: "$50 – $80",
+                desc: "Upgraded rigid handlebar setup with ergonomic grips, custom throttle module, and secure display mount.",
+                specs: [
+                    { name: "Material", val: "Aircraft Grade Aluminum" },
+                    { name: "Display", val: "TF-100 / Custom Dashboard" }
+                ]
+            },
+            brakes: {
+                title: "Hydraulic Disc Brake System",
+                images: ["brakes.jpg"],
+                price: "$90 – $130",
+                desc: "Full hydraulic braking system with electronic safety cut-off sensors for maximum stopping power and safety at high speeds.",
+                specs: [
+                    { name: "Caliper Type", val: "Dual-Piston Hydraulic" },
+                    { name: "Rotors", val: "160mm Heavy Duty Stainless" }
+                ]
+            }
+        };
+
+        function openModal(componentKey) {
+            const data = componentsData[componentKey];
+            if (!data) return;
+
+            document.getElementById('modalTitle').innerText = data.title;
+            document.getElementById('modalDesc').innerText = data.desc;
+            document.getElementById('modalPrice').innerText = "Est. Cost: " + data.price;
+
+            const imgContainer = document.getElementById('modalImagesContainer');
+            imgContainer.innerHTML = '';
+            data.images.forEach(imgSrc => {
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                img.className = data.images.length > 1 ? 'modal-img multi-img' : 'modal-img';
+                img.onerror = function() {
+                    this.src = 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800';
+                };
+                imgContainer.appendChild(img);
+            });
+
+            const specsList = document.getElementById('modalSpecs');
+            specsList.innerHTML = '';
+            data.specs.forEach(spec => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${spec.name}</span><strong>${spec.val}</strong>`;
+                specsList.appendChild(li);
+            });
+
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('infoModal').style.display = 'none';
+        }
+
+        function openDonateModal() {
+            document.getElementById('donateModal').style.display = 'flex';
+        }
+
+        function openDonateFromInfo() {
+            closeModal();
+            openDonateModal();
+        }
+
+        function closeDonateModal() {
+            document.getElementById('donateModal').style.display = 'none';
+        }
+
+        function copyWallet() {
+            const address = document.getElementById('usdtAddress').innerText;
+            navigator.clipboard.writeText(address).then(() => {
+                const notice = document.getElementById('copyNotice');
+                notice.style.display = 'block';
+                setTimeout(() => { notice.style.display = 'none'; }, 2500);
+            });
+        }
+    </script>
+</body>
+</html>
