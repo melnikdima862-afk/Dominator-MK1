@@ -565,7 +565,18 @@
         }
     </script>
 <div style="text-align: center; margin: 20px 0; color: #888; font-size: 14px;">
-    Просмотров сайта: <img src="https://counter.s11.icu/c?name=melnikdima862-afk_Dominator-MK1" alt="stats">
+    Просмотров сайта: <span id="view-counter">⏳</span>
 </div>
+<script>
+    fetch('https://api.counterapi.dev/v1/melnikdima862-afk/Dominator-MK1/hit')
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('view-counter').innerText = data.count;
+        })
+        .catch(e => {
+            document.getElementById('view-counter').innerText = '1+';
+        });
+</script>
+    
 </body>
 </html>
